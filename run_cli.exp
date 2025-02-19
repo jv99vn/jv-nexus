@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+
+set timeout -1
+
+spawn bash -c "cd $::env(NEXUS_HOME)/network-api/clients/cli && cargo run --release -- --start --beta"
+
+expect "Do you want to use the existing user account?"
+send "y\r"
+
+expect eof
