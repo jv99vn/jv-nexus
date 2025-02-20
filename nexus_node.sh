@@ -5,23 +5,28 @@ read -p "Enter the number of nodes to create: " NUM_NODES
 
 # Validate input (must be a number)
 if ! [[ "$NUM_NODES" =~ ^[0-9]+$ ]]; then
-    echo "❌ Please enter a valid integer!"
+    echo "? Please enter a valid integer!"
     exit 1
 fi
 
-# Prompt user for Node ID
-read -p "Enter Node ID: " NODE_ID
+# Create and store Node IDs
+echo "?? Please enter a unique Node ID for each node:"
+NODE_ID_LIST=()
 
-# Create a single node-id file
-echo "$NODE_ID" > node-id
-echo "✅ Created node-id file with Node ID: $NODE_ID"
+for ((i=1; i<=NUM_NODES; i++))
+do
+    read -p "Enter Node ID for node$i: " NODE_ID
+    echo "$NODE_ID" > "node-id$i"
+    NODE_ID_LIST+=("$NODE_ID")
+    echo "? Created node-id$i with Node ID: $NODE_ID"
+done
 
 # Pull the latest image
-echo "🚀 Pulling the latest Nexus prover image..."
+echo "?? Pulling the latest Nexus prover image..."
 docker pull macthanhlongg/nexus-prover
 
 # Create docker-compose.yml file
-echo "✅ Generating docker-compose.yml..."
+echo "?? Generating docker-compose.yml..."
 
 cat <<EOF > docker-compose.yml
 version: '3.8'
@@ -33,10 +38,10 @@ for ((i=1; i<=NUM_NODES; i++))
 do
 cat <<EOF >> docker-compose.yml
   node$i:
-    image: macthanhlongg/nexus-prover:latest
+    image: macthanhlongg/nexus-prover:lastest
     container_name: node$i
     volumes:
-      - ./node-id:/root/.nexus/node-id
+      - ./node-id$i:/root/.nexus/node-id
       - ./start.sh:/app/start.sh
       - ./run_cli.exp:/app/run_cli.exp
     tty: true
@@ -45,10 +50,10 @@ cat <<EOF >> docker-compose.yml
 EOF
 done
 
-echo "✅ docker-compose.yml has been created with $NUM_NODES nodes!"
+echo "? docker-compose.yml has been created with $NUM_NODES nodes!"
 
 # Start all nodes using docker-compose
-echo "🚀 Starting $NUM_NODES nodes..."
+echo "?? Starting $NUM_NODES nodes..."
 docker-compose up -d
 
-echo "✅ All nodes are running! Use 'docker ps' to check their status."
+echo "? All nodes are running! Use 'docker ps' to check their status."
