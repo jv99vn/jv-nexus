@@ -2,7 +2,7 @@
 
 set timeout -1
 
-spawn bash -c "cd $::env(NEXUS_HOME)/network-api/clients/cli && cargo run --release -- --start --beta"
+spawn bash -c "cd $::env(NEXUS_HOME)/network-api/clients/cli && cargo run -r -- start --env beta < /dev/tty"
 
 expect "Do you want to use the existing user account?"
 send "y\r"
